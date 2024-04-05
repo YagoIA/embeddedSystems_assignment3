@@ -2,10 +2,14 @@
 #include <Arduino.h>
 
 int BUTTON_PIN = 8;
+int VALVE_PIN = 3;
 
 WaterChannelController::WaterChannelController(/* args */) {
 	state = State::AUTOMATIC;
 	valveOpeningLevel = 0;
+
+	valve = new Valve();
+    valve->attachPin(VALVE_PIN);
 
 	button = new Button(BUTTON_PIN);
 
