@@ -5,7 +5,7 @@ int BUTTON_PIN = 8;
 
 WaterChannelController::WaterChannelController(/* args */) {
 	state = State::AUTOMATIC;
-	valveOpeningLevel = 0.0;
+	valveOpeningLevel = 0;
 
 	button = new Button(BUTTON_PIN);
 

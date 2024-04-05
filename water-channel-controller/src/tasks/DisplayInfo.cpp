@@ -23,6 +23,6 @@ void DisplayInfo::tick(){
 	waterChannelController->lcd->setCursor(0,1);
 	waterChannelController->lcd->print("Valve opening level: ");
 	waterChannelController->lcd->setCursor(0,2);
-	waterChannelController->lcd->print(waterChannelController->valveOpeningLevel * 100, 2);
+	waterChannelController->lcd->print(waterChannelController->valveOpeningLevel);
 	waterChannelController->lcd->print("%");
 }

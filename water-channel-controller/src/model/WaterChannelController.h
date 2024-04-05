@@ -13,8 +13,8 @@ class WaterChannelController
 
 		Button* button;
 
-		// Between 0.0 and 1.0
-		double valveOpeningLevel;
+		// Between 0 and 100
+		int valveOpeningLevel;
 
 		enum State { 
 			AUTOMATIC, 

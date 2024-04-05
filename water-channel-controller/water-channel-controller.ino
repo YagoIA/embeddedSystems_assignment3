@@ -3,6 +3,7 @@
 #include "src/kernel/Scheduler.h"
 #include "src/tasks/SwitchState.h"
 #include "src/tasks/DisplayInfo.h"
+#include "src/tasks/ReadData.h"
 
 WaterChannelController* waterChannelController;
 Scheduler sched; 
@@ -18,8 +19,12 @@ void setup() {
   Task* displayInfo = new DisplayInfo(waterChannelController);
   displayInfo->init(1000);
 
+  Task* readData = new ReadData(waterChannelController);
+  readData->init(500);
+
   sched.addTask(switchState);
   sched.addTask(displayInfo);
+  sched.addTask(readData);
 
   Serial.begin(9600);
 }
