@@ -5,6 +5,10 @@
 const char *ssid = "mert";
 const char *password = "20190602001";
 
+// // WiFi
+// const char *ssid = "POCO F2 PRO";
+// const char *password = "c.ronaldo";
+
 // MQTT Broker
 const char *mqtt_broker = "broker.emqx.io";
 const char *topic = "emqx/esp32";
@@ -18,7 +22,7 @@ PubSubClient client(espClient);
 void setup() {
     // Set software serial baud to 115200;
     Serial.begin(115200);
-    Serial.print("selam");
+    Serial.println("selam");
     // Connecting to a WiFi network
     WiFi.begin(ssid, password);
     while (WiFi.status() != WL_CONNECTED) {
@@ -58,5 +62,12 @@ void callback(char *topic, byte *payload, unsigned int length) {
 }
 
 void loop() {
+    #ifdef RGB_BUILTIN
+      digitalWrite(RGB_BUILTIN, HIGH);   // Turn the RGB LED white
+      delay(1000);
+      digitalWrite(RGB_BUILTIN, LOW);    // Turn the RGB LED off
+      delay(1000);
+    #endif
     client.loop();
+    
 }

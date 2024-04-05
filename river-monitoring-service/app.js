@@ -1,9 +1,15 @@
 import { SerialPort, ReadlineParser } from "serialport";
 import mqtt from "mqtt";
+import { SystemVariables } from "./SystemVariables.js";
 
 //const commPort = "COM7";
 const commPort = "/dev/ttyACM0";
-var valveOpeningLevel = 42;
+
+var sysVars = new SystemVariables(
+  0
+)
+
+
 
 const protocol = "mqtt";
 const host = "broker.emqx.io";
@@ -63,7 +69,7 @@ parser.on('data', data =>{
 
 
 setInterval(() => {
-  port.write(valveOpeningLevel + '\n', (err) => {
+  port.write(sysVars.valveOpeningLevel + '\n', (err) => {
     if (err) {
       return console.log('Error on write: ', err.message);
     }
@@ -71,3 +77,25 @@ setInterval(() => {
   });
 
 }, 1000);
+
+
+import express from 'express';
+
+const expressPort = 3001
+
+const app = express();
+
+app.use(express.json())
+
+app.post('/valveOpeningLevel', (req, res) => {
+  console.log(req.body.value);
+  if(req.body.value >= 0 && req.body.value <= 100){
+    sysVars.valveOpeningLevel = req.body.value;
+  }
+  
+  res.send('POST request to the homepage')  
+})
+app.listen(expressPort, () => {
+  console.log(`Example app listening on port ${port}`)
+})
+
