@@ -20,7 +20,7 @@ void setup() {
   displayInfo->init(1000);
 
   Task* readData = new ReadData(waterChannelController);
-  readData->init(500);
+  readData->init(200);
 
   sched.addTask(switchState);
   sched.addTask(displayInfo);

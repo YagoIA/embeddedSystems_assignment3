@@ -3,6 +3,7 @@
 
 #include <LiquidCrystal_I2C.h>
 #include "../devices/Button.h"
+#include "../devices/Valve.h"
 
 class WaterChannelController
 {
@@ -12,6 +13,7 @@ class WaterChannelController
 		LiquidCrystal_I2C* lcd;
 
 		Button* button;
+		Valve* valve;
 
 		// Between 0 and 100
 		int valveOpeningLevel;
