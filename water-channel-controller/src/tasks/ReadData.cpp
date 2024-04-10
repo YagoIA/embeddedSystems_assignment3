@@ -17,12 +17,15 @@ void ReadData::init(int period){
 void ReadData::tick(){
 	if(this->waterChannelController->state == WaterChannelController::State::AUTOMATIC){
 		  if(Serial.available() > 0)  {
-			receiveData();
-			String str = (char*)data;
-			int serialPercentage = str.toInt();
-			if(serialPercentage >= 0 && serialPercentage <= 100){
-				this->waterChannelController->valveOpeningLevel = serialPercentage;
-			}
+			bool readSuccess = receiveData();
+			if(readSuccess){
+				String str = (char*)data;
+				int serialPercentage = str.toInt();
+				if(readSuccess && serialPercentage >= 0 && serialPercentage <= 100){
+					this->waterChannelController->valveOpeningLevel = serialPercentage;
+				}
+			}			
+
 		  }
 	} else {
 		int potValue = analogRead(A0);
@@ -38,25 +41,28 @@ void ReadData::tick(){
 	this->waterChannelController->valve->setToPercentage(waterChannelController->valveOpeningLevel);
 }
 
-void ReadData::receiveData() {
+bool ReadData::receiveData() {
 	static char endMarker = '\n'; // message separator
 	char receivedChar;     // read char from serial port
 	int ndx = 0;          // current index of data buffer  // clean data buffer
-	memset(data, 32, sizeof(data));  // read while we have data available and we are
+	memset(data, 16, sizeof(data));  // read while we have data available and we are
 	// still receiving the same message.
-	while(Serial.available() > 0) {    receivedChar = Serial.read();    if (receivedChar == endMarker) {
-		data[ndx] = '\0'; // end current message
-		return;
+	while(Serial.available() > 0) {    
+		receivedChar = Serial.read();    
+		if (receivedChar == endMarker) {
+			data[ndx] = '\0'; // end current message
+			return true;
 		}    // looks like a valid message char, so append it and
 		// increment our index
 		data[ndx] = receivedChar;
 		ndx++;   
 		if (ndx >= DATA_MAX_SIZE) {
-		break;
+			break;
 		}
 	}  // no more available bytes to read from serial and we
 	// did not receive the separato. it's an incomplete message!
 	Serial.println("error: incomplete message");
 	//Serial.println(data);
-	memset(data, 32, sizeof(data));
+	memset(data, 16, sizeof(data));
+	return false;
 }

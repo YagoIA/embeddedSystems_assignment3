@@ -19,6 +19,8 @@ const clientId = `mqtt_${Math.random().toString(16).slice(3)}`;
 const connectUrl = `${protocol}://${host}:${brokerPort}`;
 
 const topic = "emqx/esp32";
+const wlTopic = "water-level";
+const frequencyTopic = "sample-frequency"
 
 const client = mqtt.connect(connectUrl, {
   clientId,
@@ -45,14 +47,16 @@ client.on("connect", () => {
       }
     );
   });
+
+  client.subscribe([wlTopic], () => {});
 });
 
 client.on("message", (topic, payload) => {
   console.log("Received Message:", topic, payload.toString());
 
   //TODO on ESP32 side
-  if(topic == "water-level"){
-    //sysVars.waterLevel = payload.waterLevel
+  if(topic == wlTopic){
+    sysVars.waterLevel = +payload
   }
 
 
@@ -88,27 +92,48 @@ try {
 }
 
 
+function publishSampleFrequency(){
+  client.publish(
+    frequencyTopic,
+    sysVars.monitoringFrequencyMs + "",
+    { qos: 0, retain: false },
+    (error) => {
+      if (error) {
+        console.error(error);
+      }
+    }
+  );
+}
 
+function setSampleFrequency(frequency){
+  if(frequency != sysVars.monitoringFrequencyMs){
+    sysVars.monitoringFrequencyMs = frequency
+    publishSampleFrequency()
+  }
+}
 
 var loopFunction = function(){
   console.log(sysVars.state)
   if(sysVars.waterLevel < sysVars.waterLevelRange[0]) {
-    sysVars.monitoringFrequencyMs = sysVars.MonitoringFrequencies.normalMonitoringFrequency
+    setSampleFrequency(sysVars.MonitoringFrequencies.normalMonitoringFrequency)
     sysVars.state = sysVars.States.too_low
     setValve(0)
   }
 
   if(sysVars.waterLevel >= sysVars.waterLevelRange[0] && 
     sysVars.waterLevel <= sysVars.waterLevelRange[1]) {
+    setSampleFrequency(sysVars.MonitoringFrequencies.normalMonitoringFrequency)
     sysVars.state = sysVars.States.normal
-    sysVars.monitoringFrequencyMs = sysVars.MonitoringFrequencies.normalMonitoringFrequency
     setValve(25)
   }
 
   if(sysVars.waterLevel > sysVars.waterLevelRange[1]) {
-    sysVars.monitoringFrequencyMs = sysVars.MonitoringFrequencies.alarmMonitoringFrequency
-    if(sysVars.waterLevel >= sysVars.waterLevelRange[2] &&
-       sysVars.waterLevel < sysVars.waterLevelRange[3]){
+    setSampleFrequency(sysVars.MonitoringFrequencies.alarmMonitoringFrequency)
+    if(sysVars.waterLevel <= sysVars.waterLevelRange[2]){
+      sysVars.state = sysVars.States.pre_too_high
+    }
+    if(sysVars.waterLevel > sysVars.waterLevelRange[2] &&
+       sysVars.waterLevel <= sysVars.waterLevelRange[3]){
         sysVars.state = sysVars.States.too_high
         setValve(50)
     }
@@ -147,7 +172,7 @@ app.post('/valveOpeningLevel', (req, res) => {
   console.log(req.body.value);
 
   //DEBUG
-  //sysVars.waterLevel = req.body.value;
+  sysVars.waterLevel = req.body.value;
   
   if(req.body.value >= 0 && req.body.value <= 100){
     sysVars.valveOpeningLevel = req.body.value;
