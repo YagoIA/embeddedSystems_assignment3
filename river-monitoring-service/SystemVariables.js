@@ -4,7 +4,8 @@ export class SystemVariables{
 		too_low: "too-low",
 		pre_too_high: "pre-too-high",
 		too_high: "too-high",
-		too_high_criticial: "too-high-critical"
+		too_high_criticial: "too-high-critical",
+		overwrite: "overwrite"
 	}
 
 	MonitoringFrequencies = {
