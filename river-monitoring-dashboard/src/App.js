@@ -19,7 +19,9 @@ function App(props) {
 
   useEffect(() => {
     let intervalID = setInterval(() => {
-      const backendAddr = `http://localhost:3001/status`
+      const backendAddress = "http://localhost:3001"
+      //const backendAddress = "http://192.168.148.95:3001"
+      const backendAddr = `${backendAddress}/status`
       fetch(backendAddr, {mode:'cors'})
         .then(function(res){
           res.json()
