@@ -17,6 +17,8 @@ function App(props) {
     "waterLevel": 0,
   })
 
+  var [waterLevelHistory, setWaterLevelHistory] = useState(new Array(30).fill(null))
+
   useEffect(() => {
     let intervalID = setInterval(() => {
       const backendAddress = "http://localhost:3001"
@@ -27,6 +29,15 @@ function App(props) {
           res.json()
             .then(function(data) {
               setSysVars(data)
+              //setWaterLevelHistory(oldArray => [...waterLevelHistory, data.waterLevel])
+              setWaterLevelHistory(oldArray => {
+                  var newArray = oldArray.slice(1);
+                  newArray[newArray.length] = data.waterLevel
+                  return(newArray)
+                  
+                
+
+              })
             })
         })
         .catch(function(err) {
@@ -40,7 +51,7 @@ function App(props) {
 
   return (
     <div className="App">
-      <SystemStatus data={sysVars}></SystemStatus>
+      <SystemStatus data={sysVars} waterLevelHistory={waterLevelHistory}></SystemStatus>
       <UserInput mode={sysVars.state}></UserInput>
     </div>
   );

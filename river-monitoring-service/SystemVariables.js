@@ -21,7 +21,7 @@ export class SystemVariables{
 		this.state = this.States.normal
 
 		//placeholder values
-		this.waterLevel = 100
+		this.waterLevel = null
 		this.waterLevelRange = [50, 200, 300, 400]
 	  }
 }

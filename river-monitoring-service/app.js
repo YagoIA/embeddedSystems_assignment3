@@ -132,6 +132,7 @@ var loopFunction = function(){
       setSampleFrequency(sysVars.MonitoringFrequencies.alarmMonitoringFrequency)
       if(sysVars.waterLevel <= sysVars.waterLevelRange[2]){
         sysVars.state = sysVars.States.pre_too_high
+        setValve(25)
       }
       if(sysVars.waterLevel > sysVars.waterLevelRange[2] &&
          sysVars.waterLevel <= sysVars.waterLevelRange[3]){
